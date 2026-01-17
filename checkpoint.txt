@@ -1,3 +1,0 @@
-buat token Drill 
-buat kontrak pemeriksaan siapa aja yang boleh kerja di gudang
-buat gudang token Drill (masih puyeng)
