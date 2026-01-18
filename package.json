@@ -1,8 +1,14 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@openzeppelin/contracts": "^5.4.0",
-    "hardhat": "^2.28.3"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.9",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.7",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^5.4.0"

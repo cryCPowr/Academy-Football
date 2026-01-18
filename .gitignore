@@ -1,2 +1,4 @@
 node_modules/
 checkpoint.txt
+artifacts/
+cache/
