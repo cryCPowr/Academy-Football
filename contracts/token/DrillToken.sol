@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 contract DrillToken is ERC20, ERC20Permit, Ownable2Step, ERC20Burnable {
     string private constant NAME = "Drill Token";
-    string private constant SYMBOL = "DTKN";
+    string private constant SYMBOL = "DRILL";
     uint256 private constant MAX_TOTAL_SUPPLY = 21_000_000_000_000 * (10 ** 18);
 
     constructor(address recipient) ERC20(NAME, SYMBOL) ERC20Permit(NAME) Ownable(msg.sender) {

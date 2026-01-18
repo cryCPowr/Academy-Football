@@ -1,60 +1,70 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interfaces/IDrillRegistry.sol";
 
-contract DrillStorage is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract DrillStorage is Ownable {
     using SafeERC20 for IERC20;
 
+    // --- STATE VARIABLES ---
     IDrillRegistry public registry;
 
-    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    // --- EVENTS ---
+    event FundsDispatched(address indexed token, address indexed to, uint256 amount);
+    event RegistryUpdated(address indexed oldRegistry, address indexed newRegistry);
+    event EmergencyRecovery(address indexed token, uint256 amount);
 
-    event FundsDistributed(address indexed token, address indexed to, uint256 amount, string reason);
-    event RegistryUpdated(address indexed newRegistry);
-
-    constructor() {
-        _disableInitializers();
+    // --- CONSTRUCTOR ---
+    constructor(address _registry) Ownable(msg.sender) {
+        require(_registry != address(0), "Storage: Invalid Registry");
+        registry = IDrillRegistry(_registry);
     }
 
-    function initialize(address _admin, address _registryAddress) public initializer {
-        __Ownable_init(_admin);
-        __UUPSUpgradeable_init();
+    // ==========================================
+    // 1. FUNGSI UTAMA (Eksekusi Transfer)
+    // ==========================================
 
-        registry = IDrillRegistry(_registryAddress);
+    /**
+     * @notice Kirim duit berdasarkan urutan di list Registry
+     * @param _index Urutan game di list (0, 1, 2, dst)
+     */
+    function fundGameByIndex(address _token, uint256 _index, uint256 _amount) external onlyOwner {
+        // 1. Cek dulu panjang array (biar gak error out of bound)
+        uint256 count = registry.getGameCount();
+        require(_index < count, "Storage: Index out of bound");
+
+        // 2. Ambil SATU alamat aja (Hemat Gas!)
+        address targetGame = registry.getGameAt(_index);
+
+        // 3. Transfer
+        IERC20(_token).safeTransfer(targetGame, _amount);
+        emit FundsDispatched(_token, targetGame, _amount);
     }
 
-    modifier onlyRole(bytes32 _role) {
-        require(address(registry) != address(0), "Storage: Registry not set");
-        require(registry.isAuthorized(msg.sender, _role), "Storage: Access Denied");
-        _;
-    }
+    // ==========================================
+    // 2. MAINTENANCE
+    // ==========================================
 
-    function distributeReward(address _token, address _to, uint256 _amount) external onlyRole(MANAGER_ROLE) {
-        require(IERC20(_token).balanceOf(address(this)) >= _amount, "Insufficient funds");
-
-        IERC20(_token).safeTransfer(_to, _amount);
-        emit FundsDistributed(_token, _to, _amount, "Reward Distribution");
-    }
-
-    function fundOperations(address _token, address _to, uint256 _amount) external onlyRole(ADMIN_ROLE) {
-        require(IERC20(_token).balanceOf(address(this)) >= _amount, "Insufficient funds");
-
-        IERC20(_token).safeTransfer(_to, _amount);
-        emit FundsDistributed(_token, _to, _amount, "Operational Funding");
-    }
-
-    function setRegistry(address _newRegistry) external onlyOwner {
-        require(_newRegistry != address(0), "Invalid Address");
+    /**
+     * @notice Ganti alamat Registry kalau nanti lu upgrade sistem voting.
+     */
+    function updateRegistry(address _newRegistry) external onlyOwner {
+        require(_newRegistry != address(0), "Storage: Invalid address");
+        emit RegistryUpdated(address(registry), _newRegistry);
         registry = IDrillRegistry(_newRegistry);
-        emit RegistryUpdated(_newRegistry);
     }
 
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    /**
+     * @notice Penyelamatan Token Nyasar (Panic Button).
+     * @dev HANYA bisa narik token yang BUKAN $DRILL utama kalau lu mau strict,
+     * tapi di sini gua buka untuk semua token demi keamanan aset lu.
+     * TAPI, ingat prinsip: Jangan pake ini buat bypass voting manager!
+     */
+    function recoverStrandedToken(address _token, uint256 _amount) external onlyOwner {
+        IERC20(_token).safeTransfer(msg.sender, _amount);
+        emit EmergencyRecovery(_token, _amount);
+    }
 }
