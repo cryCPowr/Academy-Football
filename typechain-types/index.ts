@@ -54,6 +54,8 @@ export type { ShortStrings } from "./@openzeppelin/contracts/utils/ShortStrings"
 export { ShortStrings__factory } from "./factories/@openzeppelin/contracts/utils/ShortStrings__factory";
 export type { Strings } from "./@openzeppelin/contracts/utils/Strings";
 export { Strings__factory } from "./factories/@openzeppelin/contracts/utils/Strings__factory";
+export type { AcademyFootball } from "./contracts/game/AcademyFootball";
+export { AcademyFootball__factory } from "./factories/contracts/game/AcademyFootball__factory";
 export type { IDrillRegistry } from "./contracts/interfaces/IDrillRegistry";
 export { IDrillRegistry__factory } from "./factories/contracts/interfaces/IDrillRegistry__factory";
 export type { DrillRegistry } from "./contracts/token/DrillRegistry";

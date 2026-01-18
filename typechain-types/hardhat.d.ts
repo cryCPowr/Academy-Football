@@ -110,6 +110,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Strings__factory>;
     getContractFactory(
+      name: "AcademyFootball",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AcademyFootball__factory>;
+    getContractFactory(
       name: "IDrillRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDrillRegistry__factory>;
@@ -247,6 +251,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Strings>;
     getContractAt(
+      name: "AcademyFootball",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AcademyFootball>;
+    getContractAt(
       name: "IDrillRegistry",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -364,6 +373,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Strings>;
     deployContract(
+      name: "AcademyFootball",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AcademyFootball>;
+    deployContract(
       name: "IDrillRegistry",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IDrillRegistry>;
@@ -500,6 +513,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Strings>;
+    deployContract(
+      name: "AcademyFootball",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AcademyFootball>;
     deployContract(
       name: "IDrillRegistry",
       args: any[],
